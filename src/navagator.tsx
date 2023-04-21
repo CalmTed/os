@@ -11,10 +11,9 @@ const Stack =  createStackNavigator()
 
 interface NavigatorModel {
   state: AppStateModel
-  setState: (prevState: AppStateModel) => void
 }
 
-export const Navigator: FC<NavigatorModel> = ({state, setState}) => {
+export const Navigator: FC<NavigatorModel> = ({state}) => {
   return <NavigationContainer>
     <Stack.Navigator
       screenOptions={{
@@ -24,10 +23,10 @@ export const Navigator: FC<NavigatorModel> = ({state, setState}) => {
         presentation: "modal"
       }}
     >
-      <Stack.Screen name="Home" component={HomeScreen}/>
+      <Stack.Screen name="Home" component={HomeScreen} initialParams={{...state}}/>
       <Stack.Screen name="People" component={PeopleScreen}/>
       <Stack.Screen name="Statuses" component={StatusesScreen}/>
       <Stack.Screen name="About" component={AboutScreen}/>
     </Stack.Navigator>
-  </NavigationContainer>;
+  </NavigationContainer>
 }

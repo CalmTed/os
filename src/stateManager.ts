@@ -1,4 +1,4 @@
-import { ActionModel, AppStateModel, SubscriberModel } from "./models";
+import { ActionModel, AppStateModel, PeopleModel, StatusModel, SubscriberModel } from "./models";
 import Storage from "react-native-storage";
 import AsyncStorage from "@react-native-community/async-storage";
 import { reducer } from "./reducer";
@@ -12,11 +12,11 @@ const storage = new Storage({
 });
 const storageName = "storageName";
 
-const getInitialAppState: () => AppStateModel = () => {
+const createAppState: () => AppStateModel = () => {
   return {
     version: VERSION,
     lastChange: new Date().getTime(),
-    theme: "dark",
+    theme: "auto",
     number: 0
   }
 }
@@ -30,7 +30,7 @@ const getState: () => Promise<AppStateModel> = async () => {
       return JSON.parse(localData);
     }catch(e) {
       //fallback to set initial state
-      const initialData = getInitialAppState();
+      const initialData = createAppState();
       await storage.save({
         key: storageName,
         data: JSON.stringify(initialData)
@@ -39,7 +39,7 @@ const getState: () => Promise<AppStateModel> = async () => {
     }
   }else{
     //or get initial
-    const initialData = getInitialAppState();
+    const initialData = createAppState();
     await storage.save({
       key: storageName,
       data: JSON.stringify(initialData)
@@ -50,7 +50,7 @@ const getState: () => Promise<AppStateModel> = async () => {
 
 const dispach: (arg: ActionModel) => Promise<void> =  async (action) => {
   const currentState = await getState().catch((e) => {
-    return getInitialAppState();
+    return createAppState();
   });
   const {state: newState, stateUpdated: stateUpdated} = reducer(currentState, action);
   //if state has changed

@@ -1,28 +1,88 @@
-import { FC, useState } from "react"
-import { View, Text, TouchableOpacity, Modal, StyleSheet, TouchableWithoutFeedback } from "react-native"
-import { COLORS, globalStyle } from "../constants"
+import React, { FC, useEffect, useState } from "react"
+import { View, Text, TouchableOpacity, Modal, StyleSheet, TouchableWithoutFeedback, ScrollView, Vibration, TextInput } from "react-native"
+import { COLORS, globalStyle, statusColorList, storageName } from "../constants"
 import { Header } from "../components/header"
 import { StackNavigationHelpers } from "@react-navigation/stack/src/types"
 import { Button, IconButton } from "../components/button"
+import { AppStateModel } from "src/models"
+import { Picker } from "@react-native-picker/picker"
+import Storage from "react-native-storage";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export interface ScreenModel {
+  route: any
   navigation: StackNavigationHelpers
 }
 
-export const HomeScreen: FC<ScreenModel> = ({navigation}) => {
+const storage = new Storage({
+  size: 100,
+  storageBackend: AsyncStorage,
+  defaultExpires: null,
+});
+
+export const HomeScreen: FC<ScreenModel> = ({route, navigation}) => {
+  const oldState = route.params as AppStateModel;
+  const [newState, setState] = useState(oldState);
+  useEffect(() => {
+    setState(oldState);
+  }, [JSON.stringify(oldState)]);
+
+  useEffect(() => {
+    storage.save({
+      key: storageName,
+      data: {...newState}
+    }).then((e) => {
+    })
+  }, [JSON.stringify(newState)]);
+
   const [modalVisible, setModalVisible] = useState(false);
   const navigateTO = (screenName: string) => {
     setModalVisible(false)
-    navigation.navigate(screenName)
+    Vibration.vibrate(20);
+    navigation.navigate(screenName, {...newState})
   }
   const toggleMenu = () => {
+    Vibration.vibrate(20);
     setModalVisible((ps) => !ps);
   }
+  const clearStatuses: () => void = () => {
+    Vibration.vibrate([0,60,100,20]);
+    setState(oldState => {
+      return {
+        ...oldState,
+        people: oldState.people.map(p => {
+          return {...p, status: null};
+        })
+      }
+    })
+  }
+  const changeStatus: (pId: number, sId: number) => void = (pId, sId) => {
+    setState(oldState => {
+      return {
+        ...oldState,
+        people: oldState.people.map(p => {
+          return p.id === pId ? {...p, status: sId} : p;
+        })
+      }
+    })
+  }
+  const resultText = `z/s: ${newState.people.length}${
+    newState.statuses.filter(st => newState.people.filter(p => p.status === st.id).length > 0).map((st, i) => {
+      const smallName = st.smallName;
+      const lenght = newState.people.filter(p => p.status === st.id).length;
+      const list = i < 1 ? " " : (newState.people.filter(p => p.status === st.id).map(p => `(${p.name})`).join(","))
+      return `\n${smallName}: ${lenght}${list}`;
+    }).join("")
+  }`;
   return <View style={globalStyle.screen}>
-    <Header navigation={navigation} title="Home" additionalChild={<IconButton onPress={toggleMenu} icon="menu" />}></Header>
+    <Header navigation={navigation} title="Personnel" additionalChildren={[
+      <IconButton onPress={clearStatuses} icon="remove-circle-outline" disabled={!newState.people.filter(p => p.status !== null).length}/>,
+      <IconButton onPress={toggleMenu} icon="menu" />
+    ]}></Header>
     <Modal visible={modalVisible} transparent={true} >
-      <TouchableWithoutFeedback style={menuStyle.backdrop} onPress={() => {setModalVisible(false)}}>
-        <View ></View>
+      <TouchableWithoutFeedback  onPress={() => {setModalVisible(false)}}>
+        <View style={menuStyle.backdrop}>
+        </View>
       </TouchableWithoutFeedback>
       <View style={menuStyle.wrapper}>
         <Button style={menuStyle.menuItem} onPress={() => navigateTO("People")} title="People"></Button>
@@ -30,9 +90,46 @@ export const HomeScreen: FC<ScreenModel> = ({navigation}) => {
         <Button style={menuStyle.menuItem} onPress={() => navigateTO("About")} title="About"></Button>
       </View>
     </Modal>
-    {/* <TouchableOpacity onPress={handlePress}>
-      <Text style={globalStyle.text}>go to About screen</Text>
-    </TouchableOpacity> */}
+    <ScrollView style={viewStyle.peopleList}>
+      <View style={viewStyle.resultView}>
+        <Text
+          style={viewStyle.resultLine}
+          selectable
+        >
+          {resultText}
+        </Text>
+      </View>
+      {!newState.people.length &&
+        <Button style={{marginLeft: 20, marginTop: 5}} onPress={()=>{navigateTO("People")}} title="Add people" icon="add"/>}
+
+      {newState.people.map((peop, i) => {
+        return <View style={viewStyle.peopleItem} key={peop.id}>
+          <Text style={viewStyle.pItemNumber}>{i + 1}</Text>
+          <Text style={viewStyle.pItemName}>{peop.name}</Text>
+          <View style={{
+            ...viewStyle.pItemPickerWrapper,
+            borderColor: newState.statuses.find(s => s.id === peop.status)?.color
+            }}>
+            <Text style={viewStyle.pItemLabel}>{newState.statuses.find(s => s.id === peop.status)?.name || ""}</Text>
+            <Picker
+              selectedValue={peop.status || "null"}
+              style={{
+                ...viewStyle.pItemPicker,
+              }}
+              dropdownIconColor={COLORS.text}
+              onValueChange={(itemValue) => {
+                changeStatus(peop.id, itemValue as number)
+              }
+            }>
+              <Picker.Item label="-" value="null"/>
+              {newState.statuses.map((s) => {
+                return <Picker.Item key={s.id} label={s.name} value={s.id}/>
+              })}
+            </Picker>
+          </View>
+        </View>
+      })}
+    </ScrollView>
   </View>
 }
 
@@ -46,10 +143,10 @@ const menuStyle = StyleSheet.create({
     top: 5,
     right: 5,
     backgroundColor: COLORS.bgLight,
-    shadowColor: '#171717',
-    shadowOffset: {width: -2, height: 4},
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    shadowColor: COLORS.bg,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 1,
+    shadowRadius: 5,
     borderRadius: 8
   },
   menuItem: {
@@ -64,5 +161,69 @@ const menuStyle = StyleSheet.create({
     position: "absolute",
     height: "100%",
     backgroundColor: COLORS.bg
+  },
+});
+const viewStyle = StyleSheet.create({
+  resultView:{
+    backgroundColor: COLORS.bgLight,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    marginHorizontal: 20,
+    marginVertical: 10,
+    borderRadius: 5
+  },
+  resultLine: {
+    fontFamily: "monospace",
+    color: COLORS.text,
+    fontSize: 15
+  },
+  peopleList: {
+    width: "100%",
+    height: "93%",
+    overflow: "scroll",
+    paddingVertical: 5
+  },
+  peopleItem: {
+    backgroundColor: COLORS.bg,
+    width: "100%",
+    marginVertical: 3,
+    borderRadius: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly" 
+  },
+  pItemNumber: {
+    width: 30,
+    textAlign: "center",
+    color: COLORS.textSecond,
+    fontSize: 18,
+    fontWeight: "bold"
+  },
+  pItemName: {
+    flex: 2,
+    color: COLORS.text,
+    fontSize: 20,
+    fontWeight: "bold"
+  },
+  pItemPickerWrapper: {
+    overflow: "hidden",
+    borderWidth: 2,
+    borderRadius: 50,
+    height: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    paddingLeft: 15
+  },
+  pItemLabel: {
+    color: COLORS.text,
+    height: "auto",
+    fontSize: 18,
+  },
+  pItemPicker: {
+    width: 40,
+    borderWidth: 0,
+    color: COLORS.text,
+    filter: "inverted(1)"
   }
 })

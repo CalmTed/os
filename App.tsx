@@ -1,30 +1,42 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View } from 'react-native';
-import { COLORS, VERSION } from './src/constants';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { storageName } from './src/constants';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { AppStateModel } from './src/models';
 import { Navigator } from './src/navagator';
+import Storage from "react-native-storage";
+import AsyncStorage from "@react-native-community/async-storage";
+import { createAppState } from "./src/constants"
 
-// root.render(<Page state={stateManager.getState()} dispach={stateManager.dispach} />);
-// stateManager.subscribe((state) => {
-//   root.render(<Page state={state} dispach={stateManager.dispach} />);
-// });
-const getInitialAppState: () => AppStateModel = () => {
-  return {
-    version: VERSION,
-    lastChange: new Date().getTime(),
-    theme: "auto",
-    number: 0
-  }
-}
+const storage = new Storage({
+  size: 100,
+  storageBackend: AsyncStorage,
+  defaultExpires: null,
+});
+
+
+
+
 
 export default function App() {
-  const [state, setState] : [AppStateModel, Dispatch<SetStateAction<AppStateModel>>] = useState(getInitialAppState);
+  const [isReady, setReady] = useState(false);
+  const [state, setState] : [AppStateModel, Dispatch<SetStateAction<AppStateModel>>] = useState(createAppState);
+
+  useEffect(() => {
+    storage.load({
+      key: storageName
+    }).then((data) => {
+      setState(data);
+      setReady(true);
+    }).catch((e) => {
+      console.error(e)
+      setReady(true);
+    })
+  })
 
   return (
     <>
-      <StatusBar style="light"/>
-      <Navigator state={state} setState={setState} />
+        {isReady && <Navigator state={state}/>}
+        <StatusBar style="light"/>
     </>
   );
   

@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { StyleSheet, View, Text } from "react-native"
+import { StyleSheet, View, Text, Vibration } from "react-native"
 import { COLORS, globalStyle } from "../constants"
 import { Button, IconButton } from "./button"
 import { StackNavigationHelpers } from "@react-navigation/stack/src/types"
@@ -9,20 +9,25 @@ interface HeaderModel{
   showBackButton?: boolean
   title?: string
   additionalChild?: React.ReactNode
+  additionalChildren?: React.ReactNode[]
 }
 
 
-export const Header: FC<HeaderModel> = ({navigation,title, showBackButton, additionalChild}) => {
+export const Header: FC<HeaderModel> = ({navigation,title, showBackButton, additionalChild, additionalChildren}) => {
   const handleBack = () => {
+    Vibration.vibrate(20);
     navigation.goBack();
   }
   return (
   <View style={headerStyle.view}>
-    {showBackButton && <IconButton onPress={handleBack} icon="arrow-back"></IconButton>}
+    {showBackButton && <IconButton onPress={handleBack} icon="close"></IconButton>}
     <View style={headerStyle.textView}>
       {title && <Text style={headerStyle.text}>{title}</Text>}
     </View>
     {additionalChild}
+    {additionalChildren && additionalChildren.map((child, i) => {
+      return <View key={i}>{child}</View>
+    })}
   </View>
 )
 }
