@@ -1,12 +1,17 @@
 {
   "expo": {
-    "name": "os",
+    "name": "Особовий склад",
     "slug": "os",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "platforms": [
+      "android"
+    ],
+    "githubUrl": "https://github.com/CalmTed/os",
+    "userInterfaceStyle": "dark",
     "primaryColor": "#DE8601",
+    "backgroundColor": "#151009",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -15,17 +20,20 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
+      "versionCode": 3,
+      "backgroundColor": "#151009",
+      "userInterfaceStyle": "dark",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#151009"
-      }
+      },
+      "package": "com.CalmTed.os"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "extra": {
+      "eas": {
+        "projectId": "138132c0-de7f-49ee-8282-6517f77476e9"
+      }
     }
   }
 }

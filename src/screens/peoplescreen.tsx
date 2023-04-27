@@ -1,13 +1,12 @@
 
 import { FC, useState } from "react"
-import { View, Text, TextInput, Vibration } from "react-native"
-import { COLORS, globalStyle } from "../constants"
+import { View, Text, Vibration } from "react-native"
+import { COLORS, globalStyle, vibrationTime } from "../constants"
 import { Header } from "../components/header"
 import { StackNavigationHelpers } from "@react-navigation/stack/src/types"
 import { IconButton } from "../components/button"
 import { AppStateModel, PeopleModel } from "../models"
 import { PeopleList } from "../components/list"
-import { Input } from "react-native-design-system"
 
 export const createPeopleItem: () => PeopleModel = () => {
   return {
@@ -21,11 +20,11 @@ export const PeopleScreen: FC<{navigation: StackNavigationHelpers, route: any}> 
   const stateNow = route.params as AppStateModel
   const [newState, setNewState] = useState(stateNow)
   const saveChanges = () => {
-    Vibration.vibrate(20);
+    Vibration.vibrate(vibrationTime.menu);
     navigation.navigate("Home", newState)
   }
   const addItem = () => {
-    Vibration.vibrate(10)
+    Vibration.vibrate(vibrationTime.addRemove)
     setNewState(oldState => {
       return {
         ...oldState,
@@ -46,7 +45,7 @@ export const PeopleScreen: FC<{navigation: StackNavigationHelpers, route: any}> 
     })
   }
   return <View style={globalStyle.screen}>
-    <Header navigation={navigation} title="People" showBackButton={true} additionalChildren={[
+    <Header navigation={navigation} title="Люди" showBackButton={true} additionalChildren={[
       <IconButton onPress={addItem} icon="add" />,
       <IconButton onPress={saveChanges} icon="checkmark" />
     ]}></Header>
@@ -54,7 +53,7 @@ export const PeopleScreen: FC<{navigation: StackNavigationHelpers, route: any}> 
         <PeopleList data={newState.people} setData={setPeople}></PeopleList>
       }
       {newState.people.length === 0 && 
-        <Text style={globalStyle.text}>Press "+" to add item</Text>
+        <Text style={globalStyle.text}>Натисність "+" щоб додати елемент</Text>
       }
   </View>
 }

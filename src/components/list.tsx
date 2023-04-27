@@ -1,10 +1,9 @@
-import React, { FC, ReactNode } from "react";
-import { View, Text, TextInput, Pressable, Vibration, StyleSheet } from "react-native";
+import React, { FC } from "react";
+import { View, TextInput, Pressable, Vibration, StyleSheet } from "react-native";
 import DraggableFlatList, { RenderItem } from "react-native-draggable-flatlist";
-import { COLORS, globalStyle, statusColorList } from "../constants";
+import { COLORS, globalStyle, statusColorList, vibrationTime } from "../constants";
 import { PeopleModel, StatusModel } from "../models";
 import { IconButton } from "./button";
-import { ColorPicker } from "react-native-color-picker";
 import { Picker } from "@react-native-picker/picker";
 
 interface PeopleListModel{
@@ -44,7 +43,7 @@ export const PeopleList: FC<PeopleListModel> = ({data, setData}) => {
         }}
           onPressIn={
             () => {
-              Vibration.vibrate(10)
+              Vibration.vibrate(vibrationTime.dragStart)
               drag()
             }
           }
@@ -53,7 +52,7 @@ export const PeopleList: FC<PeopleListModel> = ({data, setData}) => {
         <TextInput
           style={listStyle.input}
           value={item.name}
-          placeholder="Enter name..."
+          placeholder="Введіть ім'я..."
           placeholderTextColor={COLORS.textSecond}
           onChangeText={(newVal) => handleItemEdit({id: item.id, newVal: newVal})}
           editable={!isActive}
@@ -61,7 +60,7 @@ export const PeopleList: FC<PeopleListModel> = ({data, setData}) => {
         <IconButton 
           icon="close"  
           onPress={() => {
-            Vibration.vibrate(10)
+            Vibration.vibrate(vibrationTime.addRemove)
             removeItem(item.id)
         }}></IconButton>
       </View>
@@ -71,7 +70,7 @@ export const PeopleList: FC<PeopleListModel> = ({data, setData}) => {
   style={listStyle.list}
   data={data}
   onDragEnd={({ data }) => {
-      Vibration.vibrate([0,30,100,30])
+      Vibration.vibrate(vibrationTime.dragEnd)
       setData(data)
     }
   }
@@ -108,7 +107,7 @@ export const StatusesList: FC<StatusListModel> = ({data, setData}) => {
         }}
           onPressIn={
             () => {
-              Vibration.vibrate(10)
+              Vibration.vibrate(vibrationTime.dragStart)
               drag()
             }
           }
@@ -117,7 +116,7 @@ export const StatusesList: FC<StatusListModel> = ({data, setData}) => {
         <TextInput
           style={listStyle.middleInput}
           value={item.name}
-          placeholder="Enter name..."
+          placeholder="Введіть статус..."
           placeholderTextColor={COLORS.textSecond}
           onChangeText={(newVal) => handleItemEdit({id: item.id, param:"name", newVal: newVal})}
           editable={!isActive}
@@ -125,7 +124,7 @@ export const StatusesList: FC<StatusListModel> = ({data, setData}) => {
         <TextInput
           style={listStyle.smallInput}
           value={item.smallName}
-          placeholder="ABC..."
+          placeholder="абр."
           placeholderTextColor={COLORS.textSecond}
           onChangeText={(newVal) => handleItemEdit({id: item.id, param:"smallName", newVal: newVal})}
           editable={!isActive}
@@ -138,7 +137,7 @@ export const StatusesList: FC<StatusListModel> = ({data, setData}) => {
           <Picker
 
             dropdownIconColor={COLORS.bgLight}
-            prompt="Select status color"
+            prompt="Оберіть колір статусу"
             selectedValue={statusColorList.indexOf(statusColorList.find(c => c.value === item.color) || statusColorList[0])}
             style={{backgroundColor: item.color, color: "red", width: "120%", height: "100%"}}
             onValueChange={(itemValue) =>
@@ -154,7 +153,7 @@ export const StatusesList: FC<StatusListModel> = ({data, setData}) => {
         <IconButton 
           icon="close"  
           onPress={() => {
-            Vibration.vibrate(10)
+            Vibration.vibrate(vibrationTime.addRemove)
             removeItem(item.id)
         }}></IconButton>
       </View>
@@ -164,7 +163,7 @@ export const StatusesList: FC<StatusListModel> = ({data, setData}) => {
   style={listStyle.list}
   data={data}
   onDragEnd={({ data }) => {
-      Vibration.vibrate([0,30,100,30])
+      Vibration.vibrate(vibrationTime.dragEnd)
       setData(data)
     }
   }

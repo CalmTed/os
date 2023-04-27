@@ -1,13 +1,13 @@
 import React, { FC, useEffect, useState } from "react"
-import { View, Text, TouchableOpacity, Modal, StyleSheet, TouchableWithoutFeedback, ScrollView, Vibration, TextInput } from "react-native"
-import { COLORS, globalStyle, statusColorList, storageName } from "../constants"
+import { View, Text, Modal, StyleSheet, TouchableWithoutFeedback, ScrollView, Vibration } from "react-native"
+import { COLORS, globalStyle, storageName, vibrationTime } from "../constants"
 import { Header } from "../components/header"
 import { StackNavigationHelpers } from "@react-navigation/stack/src/types"
 import { Button, IconButton } from "../components/button"
 import { AppStateModel } from "src/models"
 import { Picker } from "@react-native-picker/picker"
-import Storage from "react-native-storage";
-import AsyncStorage from "@react-native-community/async-storage";
+import Storage from "react-native-storage"
+import AsyncStorage from "@react-native-community/async-storage"
 
 export interface ScreenModel {
   route: any
@@ -38,15 +38,15 @@ export const HomeScreen: FC<ScreenModel> = ({route, navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const navigateTO = (screenName: string) => {
     setModalVisible(false)
-    Vibration.vibrate(20);
+    Vibration.vibrate(vibrationTime.menu)
     navigation.navigate(screenName, {...newState})
   }
   const toggleMenu = () => {
-    Vibration.vibrate(20);
+    Vibration.vibrate(vibrationTime.menu)
     setModalVisible((ps) => !ps);
   }
   const clearStatuses: () => void = () => {
-    Vibration.vibrate([0,60,100,20]);
+    Vibration.vibrate(vibrationTime.clearList);
     setState(oldState => {
       return {
         ...oldState,
@@ -66,16 +66,16 @@ export const HomeScreen: FC<ScreenModel> = ({route, navigation}) => {
       }
     })
   }
-  const resultText = `z/s: ${newState.people.length}${
+  const resultText = `з/с: ${newState.people.length}${
     newState.statuses.filter(st => newState.people.filter(p => p.status === st.id).length > 0).map((st, i) => {
       const smallName = st.smallName;
       const lenght = newState.people.filter(p => p.status === st.id).length;
-      const list = i < 1 ? " " : (newState.people.filter(p => p.status === st.id).map(p => `(${p.name})`).join(","))
+      const list = i < 1 ? " " : "("+(newState.people.filter(p => p.status === st.id).map(p => p.name.trim()).join(",") + ")")
       return `\n${smallName}: ${lenght}${list}`;
     }).join("")
   }`;
   return <View style={globalStyle.screen}>
-    <Header navigation={navigation} title="Personnel" additionalChildren={[
+    <Header navigation={navigation} title="Особовий склад" additionalChildren={[
       <IconButton onPress={clearStatuses} icon="remove-circle-outline" disabled={!newState.people.filter(p => p.status !== null).length}/>,
       <IconButton onPress={toggleMenu} icon="menu" />
     ]}></Header>
@@ -85,9 +85,9 @@ export const HomeScreen: FC<ScreenModel> = ({route, navigation}) => {
         </View>
       </TouchableWithoutFeedback>
       <View style={menuStyle.wrapper}>
-        <Button style={menuStyle.menuItem} onPress={() => navigateTO("People")} title="People"></Button>
-        <Button style={menuStyle.menuItem} onPress={() => navigateTO("Statuses")} title="Statuses"></Button>
-        <Button style={menuStyle.menuItem} onPress={() => navigateTO("About")} title="About"></Button>
+        <Button style={menuStyle.menuItem} onPress={() => navigateTO("People")} title="Люди"></Button>
+        <Button style={menuStyle.menuItem} onPress={() => navigateTO("Statuses")} title="Статуси"></Button>
+        <Button style={menuStyle.menuItem} onPress={() => navigateTO("About")} title="Про програму"></Button>
       </View>
     </Modal>
     <ScrollView style={viewStyle.peopleList}>
@@ -100,7 +100,7 @@ export const HomeScreen: FC<ScreenModel> = ({route, navigation}) => {
         </Text>
       </View>
       {!newState.people.length &&
-        <Button style={{marginLeft: 20, marginTop: 5}} onPress={()=>{navigateTO("People")}} title="Add people" icon="add"/>}
+        <Button style={{marginLeft: 20, marginTop: 5}} onPress={()=>{navigateTO("People")}} title="Додати людей" icon="add"/>}
 
       {newState.people.map((peop, i) => {
         return <View style={viewStyle.peopleItem} key={peop.id}>
@@ -112,7 +112,10 @@ export const HomeScreen: FC<ScreenModel> = ({route, navigation}) => {
             }}>
             <Text style={viewStyle.pItemLabel}>{newState.statuses.find(s => s.id === peop.status)?.name || ""}</Text>
             <Picker
+              selectionColor={COLORS.main}
               selectedValue={peop.status || "null"}
+              dropdownIconRippleColor={COLORS.main}
+              
               style={{
                 ...viewStyle.pItemPicker,
               }}

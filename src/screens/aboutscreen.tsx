@@ -1,11 +1,10 @@
 
 import { FC } from "react"
-import { View, Text, Touchable, TouchableOpacity, Image, Vibration, ToastAndroid } from "react-native"
-import { COLORS, createAppState, globalStyle, storageName } from "../constants"
+import { View, Text, Image, Vibration, ToastAndroid } from "react-native"
+import { COLORS, createAppState, globalStyle, storageName, vibrationTime } from "../constants"
 import { Header } from "../components/header"
 import { AppStateModel } from "../models"
 import { Button } from "../components/button"
-import { useAssets } from "expo-asset"
 
 import Storage from "react-native-storage";
 import AsyncStorage from "@react-native-community/async-storage";
@@ -21,31 +20,30 @@ export const AboutScreen: FC<any> = ({navigation, route}) => {
   // console.log(JSON.stringify(route));
   const stateNow = route.params as AppStateModel
   return <View style={globalStyle.screen}>
-    <Header navigation={navigation} title="About" showBackButton={true}></Header>
-    <View style={{height: "88%", alignItems: "center"}}>
+    <Header navigation={navigation} title="Про додаток" showBackButton={true}></Header>
+    <View style={{height: "88%", alignItems: "center", marginHorizontal: 30}}>
       <Image style={{
         width: 150,
         height: 150,
         margin: 50
       }} source={require("../../assets/icon.png")}></Image>
-      <Text style={{fontSize: 45, textTransform: "uppercase", fontWeight: "800", color: COLORS.text}}>Personnel</Text>
-      <Text style={{...globalStyle.text, textAlign: "center"}}>Created by Ted Frost for Ukrainian Military Forces</Text>
-      <Text style={globalStyle.text}>Verstion: {stateNow.version}</Text>
-      <Text style={globalStyle.text}>Last update: {stateNow.lastChange}</Text>
+      <Text style={{fontSize: 35, textTransform: "uppercase", fontWeight: "800", color: COLORS.text}}>Особовий склад</Text>
+      <Text style={{...globalStyle.text, textAlign: "center", color: COLORS.textSecond}}>Створено Морозом Федором для ЗСУ у квітні 2023 по ідеї майора Т.</Text>
+      <Text style={globalStyle.text}>Версія: {stateNow.version}</Text>
+      <Text style={globalStyle.text}>Останнє оновлення: {stateNow.lastChange}</Text>
       <Button style={{
         marginTop: 100
       }} onPress={() => {
         const newState = createAppState()
-        Vibration.vibrate([0,100]);
         storage.save({
           key: storageName,
           data: {...newState}
         }).then(() => {
-          Vibration.vibrate([100,600]);
-          ToastAndroid.show("Data cleared", 20000)
+          Vibration.vibrate(vibrationTime.clearData);
+          ToastAndroid.show("Данні стерті", 20000)
           navigation.navigate("Home", {...newState})
         })
-      }} title="Clear data" icon="trash"/>
+      }} title="Стерти данні" icon="trash"/>
     </View>
   </View>
 }

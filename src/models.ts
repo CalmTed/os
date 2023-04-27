@@ -1,8 +1,6 @@
 export interface AppStateModel{
   version: string
   lastChange: string
-  theme: string
-  number: number
   people: PeopleModel[]
   statuses: StatusModel[]
 }

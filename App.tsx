@@ -13,10 +13,6 @@ const storage = new Storage({
   defaultExpires: null,
 });
 
-
-
-
-
 export default function App() {
   const [isReady, setReady] = useState(false);
   const [state, setState] : [AppStateModel, Dispatch<SetStateAction<AppStateModel>>] = useState(createAppState);
@@ -36,7 +32,7 @@ export default function App() {
   return (
     <>
         {isReady && <Navigator state={state}/>}
-        <StatusBar style="light"/>
+        <StatusBar style="auto"/>
     </>
   );
   

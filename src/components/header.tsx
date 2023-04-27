@@ -1,7 +1,7 @@
 import { FC } from "react"
 import { StyleSheet, View, Text, Vibration } from "react-native"
-import { COLORS, globalStyle } from "../constants"
-import { Button, IconButton } from "./button"
+import { COLORS, globalStyle, vibrationTime } from "../constants"
+import { IconButton } from "./button"
 import { StackNavigationHelpers } from "@react-navigation/stack/src/types"
 
 interface HeaderModel{
@@ -15,7 +15,7 @@ interface HeaderModel{
 
 export const Header: FC<HeaderModel> = ({navigation,title, showBackButton, additionalChild, additionalChildren}) => {
   const handleBack = () => {
-    Vibration.vibrate(20);
+    Vibration.vibrate(vibrationTime.menu);
     navigation.goBack();
   }
   return (

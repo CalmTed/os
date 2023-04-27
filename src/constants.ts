@@ -13,53 +13,62 @@ export const COLORS = {
   textSecond: "#767676"
 }
 
+export const vibrationTime = {
+  menu: [0,10],
+  clearList: [0,100,200,20,100,20],
+  clearData: [0,40,100,400],
+  dragStart: [0,20],
+  dragEnd: [0,20,100,20],
+  addRemove: [0,10]
+}
+
 export const statusColorList = [
   {
-    label: "red",
+    label: "Червоний",
     value: "#CE2424"
   },
   {
-    label: "orange",
+    label: "Помаранчевий",
     value: "#DE8601"
   },
   {
-    label: "yellow",
+    label: "Жовтий",
     value: "#CBCE24"
   },
   {
-    label: "green",
+    label: "Салатовий",
     value: "#30CE24"
   },
   {
-    label: "dark green",
+    label: "Зелений",
     value: "#096507"
   },
   {
-    label: "mint",
+    label: "Ментоловий",
     value: "#24CEB2"
   },
   {
-    label: "light blue",
+    label: "Блакитний",
     value: "#247CCE"
   },
   {
-    label: "blue",
+    label: "Синій",
     value: "#2427CE"
   },
   {
-    label: "purple",
+    label: "Фіолетовий",
     value: "#8224CE"
   },
   {
-    label: "pink",
+    label: "Рожевий",
     value: "#CE2485"
   },
   {
-    label: "white",
+    label: "Білий",
     value: "#eee"
   },
   {
-    label: "brown",
+    label: "Коричневий",
     value: "#6F5F48"
   }
 ]
@@ -76,17 +85,15 @@ export const globalStyle = StyleSheet.create({
   },
   text: {
     color: COLORS.text,
-    fontSize: 20,
+    fontSize: 18,
     marginVertical: 10
   }
-});
+})
 
 export const createAppState: () => AppStateModel = () => {
   return {
     version: VERSION,
-    lastChange: "2023-04-21",
-    theme: "dark",
-    number: 0,  
+    lastChange: "2023-04-22",
     people: [],
     statuses: []
   }

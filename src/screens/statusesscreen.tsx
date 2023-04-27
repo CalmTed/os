@@ -1,11 +1,11 @@
 
 import { FC, useState } from "react"
 import { View, Text, Vibration } from "react-native"
-import { COLORS, globalStyle } from "../constants"
+import { COLORS, globalStyle, vibrationTime } from "../constants"
 import { Header } from "../components/header"
 import { StackNavigationHelpers } from "@react-navigation/stack/src/types"
 import { IconButton } from "../components/button"
-import { AppStateModel, PeopleModel, StatusModel } from "../models"
+import { AppStateModel, StatusModel } from "../models"
 import { StatusesList } from "../components/list"
 
 export const createStatusItem: () => StatusModel = () => {
@@ -21,11 +21,11 @@ export const StatusesScreen: FC<{navigation: StackNavigationHelpers, route: any}
   const stateNow = route.params as AppStateModel
   const [newState, setNewState] = useState(stateNow)
   const saveChanges = () => {
-    Vibration.vibrate(20);
+    Vibration.vibrate(vibrationTime.menu);
     navigation.navigate("Home", newState)
   }
   const addItem = () => {
-    Vibration.vibrate(10)
+    Vibration.vibrate(vibrationTime.addRemove)
     setNewState(oldState => {
       return {
         ...oldState,
@@ -46,7 +46,7 @@ export const StatusesScreen: FC<{navigation: StackNavigationHelpers, route: any}
     })
   }
   return <View style={globalStyle.screen}>
-    <Header navigation={navigation} title="Statuses" showBackButton={true} additionalChildren={[
+    <Header navigation={navigation} title="Статуси" showBackButton={true} additionalChildren={[
       <IconButton onPress={addItem} icon="add" />,
       <IconButton onPress={saveChanges} icon="checkmark" />
     ]}></Header>
@@ -54,7 +54,7 @@ export const StatusesScreen: FC<{navigation: StackNavigationHelpers, route: any}
         <StatusesList data={newState.statuses} setData={setStatus}></StatusesList>
       }
       {newState.statuses.length === 0 && 
-        <Text style={globalStyle.text}>Press "+" to add item</Text>
+        <Text style={globalStyle.text}>Натисність "+" щоб додати елемент</Text>
       }
   </View>
 }
